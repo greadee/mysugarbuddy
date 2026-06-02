@@ -1,0 +1,13 @@
+bin/
+obj/
+
+.vs/
+.vscode/
+
+.appdata/
+.dotnet/
+.dotnet-home/
+.localappdata/
+.nuget/
+
+.dotnet-install.ps1
