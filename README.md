@@ -6,8 +6,10 @@ For now this is just Phase 0: get a basic .NET 8 project building and keep the r
 
 ## Current Status
 
-- .NET 8 console app
-- Basic solution file
+- .NET 8 solution
+- Empty project shells for Domain, Application, Infrastructure, and Desktop
+- Desktop is still just a console app for now
+- Project references are not wired up yet
 - No Dexcom connection yet
 - No database yet
 - No desktop UI yet
