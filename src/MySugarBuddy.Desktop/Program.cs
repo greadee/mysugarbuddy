@@ -1,2 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿Console.WriteLine("My Sugar Buddy");
+Console.WriteLine();
+Console.WriteLine("Desktop app placeholder");
+Console.WriteLine("Dexcom sync, local storage, and alerts are not implemented yet.");
