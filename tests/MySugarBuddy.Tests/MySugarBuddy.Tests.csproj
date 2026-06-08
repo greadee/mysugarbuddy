@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\MySugarBuddy.Domain\MySugarBuddy.Domain.csproj" />
+    <ProjectReference Include="..\..\src\MySugarBuddy.Application\MySugarBuddy.Application.csproj" />
   </ItemGroup>
 
 </Project>
