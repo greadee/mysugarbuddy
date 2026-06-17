@@ -1,4 +1,34 @@
-﻿Console.WriteLine("My Sugar Buddy");
+using MySugarBuddy.Application;
+using MySugarBuddy.Infrastructure;
+
+Console.WriteLine("My Sugar Buddy");
 Console.WriteLine();
-Console.WriteLine("Desktop app placeholder");
-Console.WriteLine("Dexcom sync, local storage, and alerts are not implemented yet.");
+
+var readingSource = new SampleGlucoseReadingSource();
+var alertService = new GlucoseAlertService();
+
+var readings = readingSource.GetRecentReadings();
+var previous = readings[0];
+var current = readings[1];
+var alerts = alertService.CheckForAlerts(previous, current);
+
+Console.WriteLine($"Previous reading: {previous.ValueMgPerDl} mg/dL at {previous.RecordedAt:t}");
+Console.WriteLine($"Current reading:  {current.ValueMgPerDl} mg/dL at {current.RecordedAt:t}");
+Console.WriteLine();
+
+if (alerts.Count == 0)
+{
+    Console.WriteLine("No alerts for the sample readings.");
+}
+else
+{
+    Console.WriteLine("Sample alerts:");
+
+    foreach (var alert in alerts)
+    {
+        Console.WriteLine($"- {alert}");
+    }
+}
+
+Console.WriteLine();
+Console.WriteLine("Dexcom sync, local storage, and real desktop notifications are not implemented yet.");
