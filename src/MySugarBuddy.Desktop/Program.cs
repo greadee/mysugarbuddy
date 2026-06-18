@@ -6,17 +6,22 @@ Console.WriteLine("My Sugar Buddy");
 Console.WriteLine();
 
 var readingSource = new SampleGlucoseReadingSource();
+var readingRepository = new JsonGlucoseReadingRepository(Path.Combine("data", "glucose-readings.json"));
 var alertService = new GlucoseAlertService();
 
 var readings = readingSource.GetRecentReadings();
+readingRepository.SaveReadings(readings);
+var savedReadings = readingRepository.LoadReadings();
+
 var previous = readings[0];
 var current = readings[1];
 var alerts = alertService.CheckForAlerts(previous, current);
-var summary = GlucoseSummaryCalculator.Calculate(readings);
+var summary = GlucoseSummaryCalculator.Calculate(savedReadings);
 
 Console.WriteLine($"Previous reading: {previous.ValueMgPerDl} mg/dL at {previous.RecordedAt:t}");
 Console.WriteLine($"Current reading:  {current.ValueMgPerDl} mg/dL at {current.RecordedAt:t}");
 Console.WriteLine();
+Console.WriteLine("Saved sample readings to data/glucose-readings.json");
 Console.WriteLine($"Readings loaded: {summary.ReadingCount}");
 Console.WriteLine($"Average glucose: {summary.AverageValueMgPerDl:F1} mg/dL");
 Console.WriteLine($"Range:           {summary.LowestValueMgPerDl}-{summary.HighestValueMgPerDl} mg/dL");

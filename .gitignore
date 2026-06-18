@@ -11,3 +11,5 @@ obj/
 .nuget/
 
 .dotnet-install.ps1
+
+data/
