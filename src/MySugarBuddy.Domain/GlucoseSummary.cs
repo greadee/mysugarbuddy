@@ -2,12 +2,20 @@ namespace MySugarBuddy.Domain;
 
 public class GlucoseSummary
 {
-    public GlucoseSummary(int readingCount, int lowestValueMgPerDl, int highestValueMgPerDl, double averageValueMgPerDl)
+    public GlucoseSummary(
+        int readingCount,
+        int lowestValueMgPerDl,
+        int highestValueMgPerDl,
+        double averageValueMgPerDl,
+        int inRangeCount,
+        double inRangePercentage)
     {
         ReadingCount = readingCount;
         LowestValueMgPerDl = lowestValueMgPerDl;
         HighestValueMgPerDl = highestValueMgPerDl;
         AverageValueMgPerDl = averageValueMgPerDl;
+        InRangeCount = inRangeCount;
+        InRangePercentage = inRangePercentage;
     }
 
     public int ReadingCount { get; }
@@ -17,4 +25,8 @@ public class GlucoseSummary
     public int HighestValueMgPerDl { get; }
 
     public double AverageValueMgPerDl { get; }
+
+    public int InRangeCount { get; }
+
+    public double InRangePercentage { get; }
 }

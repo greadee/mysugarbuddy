@@ -10,11 +10,14 @@ public static class GlucoseSummaryCalculator
         }
 
         var values = readings.Select(reading => reading.ValueMgPerDl).ToList();
+        var inRangeCount = readings.Count(reading => !reading.IsLow && !reading.IsHigh);
 
         return new GlucoseSummary(
             readings.Count,
             values.Min(),
             values.Max(),
-            values.Average());
+            values.Average(),
+            inRangeCount,
+            (double)inRangeCount / readings.Count * 100);
     }
 }

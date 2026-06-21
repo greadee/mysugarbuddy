@@ -36,6 +36,26 @@ public class GlucoseSummaryCalculatorTests
     }
 
     [Fact]
+    public void CalculatesInRangeCount()
+    {
+        var readings = CreateMixedRangeReadings();
+
+        var summary = GlucoseSummaryCalculator.Calculate(readings);
+
+        Assert.Equal(2, summary.InRangeCount);
+    }
+
+    [Fact]
+    public void CalculatesInRangePercentage()
+    {
+        var readings = CreateMixedRangeReadings();
+
+        var summary = GlucoseSummaryCalculator.Calculate(readings);
+
+        Assert.Equal(50, summary.InRangePercentage);
+    }
+
+    [Fact]
     public void RejectsEmptyReadingList()
     {
         Assert.Throws<ArgumentException>(() =>
@@ -51,6 +71,19 @@ public class GlucoseSummaryCalculatorTests
             new GlucoseReading(95, startTime),
             new GlucoseReading(110, startTime.AddMinutes(5)),
             new GlucoseReading(125, startTime.AddMinutes(10))
+        };
+    }
+
+    private static IReadOnlyList<GlucoseReading> CreateMixedRangeReadings()
+    {
+        var startTime = new DateTime(2026, 1, 15, 8, 0, 0);
+
+        return new[]
+        {
+            new GlucoseReading(65, startTime),
+            new GlucoseReading(90, startTime.AddMinutes(5)),
+            new GlucoseReading(150, startTime.AddMinutes(10)),
+            new GlucoseReading(190, startTime.AddMinutes(15))
         };
     }
 }
