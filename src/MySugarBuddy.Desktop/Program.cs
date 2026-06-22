@@ -29,6 +29,7 @@ Console.WriteLine($"Readings loaded: {snapshot.Summary.ReadingCount}");
 Console.WriteLine($"Average glucose: {snapshot.Summary.AverageValueMgPerDl:F1} mg/dL");
 Console.WriteLine($"Range:           {snapshot.Summary.LowestValueMgPerDl}-{snapshot.Summary.HighestValueMgPerDl} mg/dL");
 Console.WriteLine($"Time in range:   {snapshot.Summary.InRangePercentage:F0}% ({snapshot.Summary.InRangeCount}/{snapshot.Summary.ReadingCount})");
+Console.WriteLine($"GMI estimate:    {snapshot.Summary.GmiPercentage:F1}%");
 if (snapshot.CurrentTrend is not null)
 {
     Console.WriteLine($"Current trend:   {snapshot.CurrentTrend}");

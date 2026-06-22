@@ -56,6 +56,16 @@ public class GlucoseSummaryCalculatorTests
     }
 
     [Fact]
+    public void CalculatesGmiPercentage()
+    {
+        var readings = CreateReadings();
+
+        var summary = GlucoseSummaryCalculator.Calculate(readings);
+
+        Assert.Equal(5.9, summary.GmiPercentage, 1);
+    }
+
+    [Fact]
     public void RejectsEmptyReadingList()
     {
         Assert.Throws<ArgumentException>(() =>

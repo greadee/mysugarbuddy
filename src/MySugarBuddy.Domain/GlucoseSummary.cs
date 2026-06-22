@@ -8,7 +8,8 @@ public class GlucoseSummary
         int highestValueMgPerDl,
         double averageValueMgPerDl,
         int inRangeCount,
-        double inRangePercentage)
+        double inRangePercentage,
+        double gmiPercentage)
     {
         ReadingCount = readingCount;
         LowestValueMgPerDl = lowestValueMgPerDl;
@@ -16,6 +17,7 @@ public class GlucoseSummary
         AverageValueMgPerDl = averageValueMgPerDl;
         InRangeCount = inRangeCount;
         InRangePercentage = inRangePercentage;
+        GmiPercentage = gmiPercentage;
     }
 
     public int ReadingCount { get; }
@@ -29,4 +31,6 @@ public class GlucoseSummary
     public int InRangeCount { get; }
 
     public double InRangePercentage { get; }
+
+    public double GmiPercentage { get; }
 }
