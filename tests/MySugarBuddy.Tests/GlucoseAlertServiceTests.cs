@@ -20,6 +20,18 @@ public class GlucoseAlertServiceTests
     }
 
     [Fact]
+    public void ReturnsCalculatedTrend()
+    {
+        var service = new GlucoseAlertService();
+        var previous = new GlucoseReading(100, _startTime);
+        var current = new GlucoseReading(115, _startTime.AddMinutes(5));
+
+        var result = service.CheckReadingPair(previous, current);
+
+        Assert.Equal(GlucoseTrend.RisingFast, result.Trend);
+    }
+
+    [Fact]
     public void FindsLowAlertOnCurrentReading()
     {
         var service = new GlucoseAlertService();

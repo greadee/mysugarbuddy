@@ -47,6 +47,18 @@ public class GlucoseReadingServiceTests
     }
 
     [Fact]
+    public void RefreshReadingsReturnsCurrentTrend()
+    {
+        var readings = CreateFastRisingReadings();
+        var repository = new FakeGlucoseReadingRepository();
+        var service = CreateService(readings, repository);
+
+        var snapshot = service.RefreshReadings();
+
+        Assert.Equal(GlucoseTrend.RisingFast, snapshot.CurrentTrend);
+    }
+
+    [Fact]
     public void RefreshReadingsReturnsNoAlertsWhenOnlyOneReadingExists()
     {
         var readings = new[]
@@ -59,6 +71,7 @@ public class GlucoseReadingServiceTests
         var snapshot = service.RefreshReadings();
 
         Assert.Empty(snapshot.Alerts);
+        Assert.Null(snapshot.CurrentTrend);
     }
 
     private GlucoseReadingService CreateService(

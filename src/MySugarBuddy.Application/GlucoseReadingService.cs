@@ -26,18 +26,22 @@ public class GlucoseReadingService
 
         var savedReadings = _readingRepository.LoadReadings();
         var summary = GlucoseSummaryCalculator.Calculate(savedReadings);
-        var alerts = GetAlerts(savedReadings);
+        var alertResult = GetAlertResult(savedReadings);
 
-        return new GlucoseReadingSnapshot(savedReadings, summary, alerts);
+        return new GlucoseReadingSnapshot(
+            savedReadings,
+            summary,
+            alertResult?.Trend,
+            alertResult?.Alerts ?? Array.Empty<GlucoseAlertType>());
     }
 
-    private IReadOnlyList<GlucoseAlertType> GetAlerts(IReadOnlyList<GlucoseReading> readings)
+    private GlucoseAlertResult? GetAlertResult(IReadOnlyList<GlucoseReading> readings)
     {
         if (readings.Count < 2)
         {
-            return Array.Empty<GlucoseAlertType>();
+            return null;
         }
 
-        return _alertService.CheckForAlerts(readings[^2], readings[^1]);
+        return _alertService.CheckReadingPair(readings[^2], readings[^1]);
     }
 }

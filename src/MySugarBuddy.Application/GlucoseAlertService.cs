@@ -6,8 +6,14 @@ public class GlucoseAlertService
 {
     public IReadOnlyList<GlucoseAlertType> CheckForAlerts(GlucoseReading previous, GlucoseReading current)
     {
-        var trend = GlucoseTrendCalculator.Calculate(previous, current);
+        return CheckReadingPair(previous, current).Alerts;
+    }
 
-        return GlucoseAlertEvaluator.GetAlerts(current, trend);
+    public GlucoseAlertResult CheckReadingPair(GlucoseReading previous, GlucoseReading current)
+    {
+        var trend = GlucoseTrendCalculator.Calculate(previous, current);
+        var alerts = GlucoseAlertEvaluator.GetAlerts(current, trend);
+
+        return new GlucoseAlertResult(trend, alerts);
     }
 }
