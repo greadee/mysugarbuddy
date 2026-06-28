@@ -1,4 +1,5 @@
 using MySugarBuddy.Application;
+using MySugarBuddy.Desktop;
 using MySugarBuddy.Infrastructure;
 
 Console.WriteLine("My Sugar Buddy");
@@ -7,7 +8,8 @@ Console.WriteLine();
 var readingSource = new FileGlucoseReadingSource(Path.Combine("samples", "glucose-readings.csv"));
 var readingRepository = new JsonGlucoseReadingRepository(Path.Combine("data", "glucose-readings.json"));
 var alertService = new GlucoseAlertService();
-var readingService = new GlucoseReadingService(readingSource, readingRepository, alertService);
+var notificationPort = new WindowsNotificationPort(new ConsoleNotificationPort());
+var readingService = new GlucoseReadingService(readingSource, readingRepository, alertService, notificationPort);
 
 var snapshot = readingService.RefreshReadings();
 var previous = snapshot.PreviousReading;
@@ -52,4 +54,4 @@ else
 }
 
 Console.WriteLine();
-Console.WriteLine("Dexcom sync, local storage, and real desktop notifications are not implemented yet.");
+Console.WriteLine("Dexcom sync is not implemented yet. Notifications use Windows when available, with console fallback.");

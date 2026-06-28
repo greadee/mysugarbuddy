@@ -59,6 +59,39 @@ public class GlucoseReadingServiceTests
     }
 
     [Fact]
+    public void RefreshReadingsDispatchesNotificationWhenAlertsExist()
+    {
+        var readings = CreateFastRisingReadings();
+        var repository = new FakeGlucoseReadingRepository();
+        var notificationPort = new FakeNotificationPort();
+        var service = CreateService(readings, repository, notificationPort);
+
+        service.RefreshReadings();
+
+        var notification = Assert.Single(notificationPort.SentMessages);
+        Assert.Equal("Glucose alert", notification.Title);
+        Assert.Contains("118 mg/dL", notification.Body);
+        Assert.Contains("RisingFast", notification.Body);
+    }
+
+    [Fact]
+    public void RefreshReadingsSkipsNotificationWhenNoAlertsExist()
+    {
+        var readings = new[]
+        {
+            new GlucoseReading(105, _startTime),
+            new GlucoseReading(108, _startTime.AddMinutes(5))
+        };
+        var repository = new FakeGlucoseReadingRepository();
+        var notificationPort = new FakeNotificationPort();
+        var service = CreateService(readings, repository, notificationPort);
+
+        service.RefreshReadings();
+
+        Assert.Empty(notificationPort.SentMessages);
+    }
+
+    [Fact]
     public void RefreshReadingsReturnsNoAlertsWhenOnlyOneReadingExists()
     {
         var readings = new[]
@@ -76,12 +109,14 @@ public class GlucoseReadingServiceTests
 
     private GlucoseReadingService CreateService(
         IReadOnlyList<GlucoseReading> readings,
-        FakeGlucoseReadingRepository repository)
+        FakeGlucoseReadingRepository repository,
+        INotificationPort? notificationPort = null)
     {
         return new GlucoseReadingService(
             new FakeGlucoseReadingSource(readings),
             repository,
-            new GlucoseAlertService());
+            new GlucoseAlertService(),
+            notificationPort);
     }
 
     private IReadOnlyList<GlucoseReading> CreateFastRisingReadings()
@@ -120,6 +155,16 @@ public class GlucoseReadingServiceTests
         public IReadOnlyList<GlucoseReading> LoadReadings()
         {
             return SavedReadings;
+        }
+    }
+
+    private class FakeNotificationPort : INotificationPort
+    {
+        public List<NotificationMessage> SentMessages { get; } = new();
+
+        public void Send(NotificationMessage message)
+        {
+            SentMessages.Add(message);
         }
     }
 }
