@@ -6,7 +6,7 @@ Console.WriteLine("My Sugar Buddy");
 Console.WriteLine();
 
 var readingSource = new FileGlucoseReadingSource(Path.Combine("samples", "glucose-readings.csv"));
-var readingRepository = new JsonGlucoseReadingRepository(Path.Combine("data", "glucose-readings.json"));
+var readingRepository = new SqliteGlucoseReadingRepository(Path.Combine("data", "glucose-readings.db"));
 var alertService = new GlucoseAlertService();
 var notificationPort = new WindowsNotificationPort(new ConsoleNotificationPort());
 var readingService = new GlucoseReadingService(readingSource, readingRepository, alertService, notificationPort);
@@ -27,7 +27,7 @@ if (current is not null)
 
 Console.WriteLine();
 Console.WriteLine("Loaded sample readings from samples/glucose-readings.csv");
-Console.WriteLine("Saved readings to data/glucose-readings.json");
+Console.WriteLine("Saved readings to data/glucose-readings.db");
 Console.WriteLine($"Readings loaded: {snapshot.Summary.ReadingCount}");
 Console.WriteLine($"Average glucose: {snapshot.Summary.AverageValueMgPerDl:F1} mg/dL");
 Console.WriteLine($"Range:           {snapshot.Summary.LowestValueMgPerDl}-{snapshot.Summary.HighestValueMgPerDl} mg/dL");
