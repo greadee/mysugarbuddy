@@ -4,7 +4,7 @@ using MySugarBuddy.Infrastructure;
 Console.WriteLine("My Sugar Buddy");
 Console.WriteLine();
 
-var readingSource = new SampleGlucoseReadingSource();
+var readingSource = new FileGlucoseReadingSource(Path.Combine("samples", "glucose-readings.csv"));
 var readingRepository = new JsonGlucoseReadingRepository(Path.Combine("data", "glucose-readings.json"));
 var alertService = new GlucoseAlertService();
 var readingService = new GlucoseReadingService(readingSource, readingRepository, alertService);
@@ -24,7 +24,8 @@ if (current is not null)
 }
 
 Console.WriteLine();
-Console.WriteLine("Saved sample readings to data/glucose-readings.json");
+Console.WriteLine("Loaded sample readings from samples/glucose-readings.csv");
+Console.WriteLine("Saved readings to data/glucose-readings.json");
 Console.WriteLine($"Readings loaded: {snapshot.Summary.ReadingCount}");
 Console.WriteLine($"Average glucose: {snapshot.Summary.AverageValueMgPerDl:F1} mg/dL");
 Console.WriteLine($"Range:           {snapshot.Summary.LowestValueMgPerDl}-{snapshot.Summary.HighestValueMgPerDl} mg/dL");
