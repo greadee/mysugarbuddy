@@ -23,22 +23,9 @@ public class SqliteGlucoseReadingRepository : IGlucoseReadingRepository
         EnsureSchema(connection);
 
         using var transaction = connection.BeginTransaction();
-        using var deleteCommand = connection.CreateCommand();
-        deleteCommand.Transaction = transaction;
-        deleteCommand.CommandText = "DELETE FROM glucose_readings;";
-        deleteCommand.ExecuteNonQuery();
-
         foreach (var reading in readings)
         {
-            using var insertCommand = connection.CreateCommand();
-            insertCommand.Transaction = transaction;
-            insertCommand.CommandText = """
-                INSERT INTO glucose_readings (value_mg_per_dl, recorded_at)
-                VALUES ($value_mg_per_dl, $recorded_at);
-                """;
-            insertCommand.Parameters.AddWithValue("$value_mg_per_dl", reading.ValueMgPerDl);
-            insertCommand.Parameters.AddWithValue("$recorded_at", reading.RecordedAt.ToString(DateTimeFormat, CultureInfo.InvariantCulture));
-            insertCommand.ExecuteNonQuery();
+            SaveReading(connection, transaction, reading);
         }
 
         transaction.Commit();
@@ -97,8 +84,57 @@ public class SqliteGlucoseReadingRepository : IGlucoseReadingRepository
                 value_mg_per_dl INTEGER NOT NULL,
                 recorded_at TEXT NOT NULL
             );
-            """;
+        """;
         command.ExecuteNonQuery();
+    }
+
+    private static void SaveReading(SqliteConnection connection, SqliteTransaction transaction, GlucoseReading reading)
+    {
+        var recordedAt = reading.RecordedAt.ToString(DateTimeFormat, CultureInfo.InvariantCulture);
+        var existingId = FindReadingId(connection, transaction, recordedAt);
+
+        if (existingId is null)
+        {
+            using var insertCommand = connection.CreateCommand();
+            insertCommand.Transaction = transaction;
+            insertCommand.CommandText = """
+                INSERT INTO glucose_readings (value_mg_per_dl, recorded_at)
+                VALUES ($value_mg_per_dl, $recorded_at);
+                """;
+            insertCommand.Parameters.AddWithValue("$value_mg_per_dl", reading.ValueMgPerDl);
+            insertCommand.Parameters.AddWithValue("$recorded_at", recordedAt);
+            insertCommand.ExecuteNonQuery();
+
+            return;
+        }
+
+        using var updateCommand = connection.CreateCommand();
+        updateCommand.Transaction = transaction;
+        updateCommand.CommandText = """
+            UPDATE glucose_readings
+            SET value_mg_per_dl = $value_mg_per_dl
+            WHERE id = $id;
+            """;
+        updateCommand.Parameters.AddWithValue("$value_mg_per_dl", reading.ValueMgPerDl);
+        updateCommand.Parameters.AddWithValue("$id", existingId.Value);
+        updateCommand.ExecuteNonQuery();
+    }
+
+    private static long? FindReadingId(SqliteConnection connection, SqliteTransaction transaction, string recordedAt)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = """
+            SELECT id
+            FROM glucose_readings
+            WHERE recorded_at = $recorded_at
+            ORDER BY id
+            LIMIT 1;
+            """;
+        command.Parameters.AddWithValue("$recorded_at", recordedAt);
+
+        var result = command.ExecuteScalar();
+        return result is null ? null : Convert.ToInt64(result, CultureInfo.InvariantCulture);
     }
 
     private void EnsureDatabaseFolderExists()

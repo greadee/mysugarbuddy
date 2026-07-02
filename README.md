@@ -4,16 +4,17 @@ My Sugar Buddy is a small C#/.NET desktop app project for tracking blood sugar d
 
 The long term idea is to connect to Dexcom G6 data, save readings locally, look for patterns in past glucose readings, and eventually show desktop notifications for high, low, rising fast, and dropping fast events.
 
-For now this is still early setup work. I am adding the project structure first and will fill in the actual features in later phases.
+For now this is still early setup work. The app loads sample readings, saves them locally, calculates a few basic stats, and prints alert information in the console.
 
 ## Current Status
 
 - .NET 8 solution
-- Empty project shells for Domain, Application, Infrastructure, and Desktop
+- Domain, Application, Infrastructure, and Desktop projects are wired together
 - Desktop is still just a console app for now
-- Basic project references are wired up
+- Sample CSV readings load into the app
+- Readings are saved locally with SQLite
+- Basic summaries, GMI estimate, recent history, trend, and alerts are printed
 - No Dexcom connection yet
-- No database yet
 - No desktop UI yet
 
 ## Project Structure

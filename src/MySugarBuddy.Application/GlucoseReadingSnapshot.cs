@@ -27,4 +27,16 @@ public class GlucoseReadingSnapshot
     public GlucoseReading? PreviousReading => Readings.Count >= 2 ? Readings[^2] : null;
 
     public GlucoseReading? CurrentReading => Readings.Count >= 1 ? Readings[^1] : null;
+
+    public IReadOnlyList<GlucoseReading> RecentReadings(int count)
+    {
+        if (count <= 0)
+        {
+            return Array.Empty<GlucoseReading>();
+        }
+
+        return Readings
+            .Skip(Math.Max(0, Readings.Count - count))
+            .ToList();
+    }
 }

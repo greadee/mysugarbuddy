@@ -39,6 +39,13 @@ if (snapshot.CurrentTrend is not null)
 }
 Console.WriteLine();
 
+Console.WriteLine("Recent readings:");
+foreach (var reading in snapshot.RecentReadings(5))
+{
+    Console.WriteLine($"- {reading.RecordedAt:g}: {reading.ValueMgPerDl} mg/dL");
+}
+Console.WriteLine();
+
 if (snapshot.Alerts.Count == 0)
 {
     Console.WriteLine("No alerts for the sample readings.");

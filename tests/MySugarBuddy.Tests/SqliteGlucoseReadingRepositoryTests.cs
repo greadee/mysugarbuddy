@@ -43,21 +43,55 @@ public class SqliteGlucoseReadingRepositoryTests
     }
 
     [Fact]
-    public void SaveReadingsReplacesExistingReadings()
+    public void SaveReadingsAppendsNewReadings()
     {
         var repository = new SqliteGlucoseReadingRepository(CreateTempDatabasePath());
-        var replacementReadings = new[]
-        {
-            new GlucoseReading(140, new DateTime(2026, 1, 15, 9, 0, 0))
-        };
+        var newReading = new GlucoseReading(140, new DateTime(2026, 1, 15, 9, 0, 0));
 
         repository.SaveReadings(CreateReadings());
-        repository.SaveReadings(replacementReadings);
+        repository.SaveReadings(new[] { newReading });
+        var loadedReadings = repository.LoadReadings();
+
+        Assert.Equal(3, loadedReadings.Count);
+        Assert.Equal(100, loadedReadings[0].ValueMgPerDl);
+        Assert.Equal(115, loadedReadings[1].ValueMgPerDl);
+        Assert.Equal(newReading.ValueMgPerDl, loadedReadings[2].ValueMgPerDl);
+        Assert.Equal(newReading.RecordedAt, loadedReadings[2].RecordedAt);
+    }
+
+    [Fact]
+    public void SaveReadingsUpdatesDuplicateTimestamp()
+    {
+        var repository = new SqliteGlucoseReadingRepository(CreateTempDatabasePath());
+        var updatedReading = new GlucoseReading(125, new DateTime(2026, 1, 15, 8, 5, 0));
+
+        repository.SaveReadings(CreateReadings());
+        repository.SaveReadings(new[] { updatedReading });
+        var loadedReadings = repository.LoadReadings();
+
+        Assert.Equal(2, loadedReadings.Count);
+        Assert.Equal(100, loadedReadings[0].ValueMgPerDl);
+        Assert.Equal(updatedReading.ValueMgPerDl, loadedReadings[1].ValueMgPerDl);
+        Assert.Equal(updatedReading.RecordedAt, loadedReadings[1].RecordedAt);
+    }
+
+    [Fact]
+    public void SaveReadingsDoesNotDuplicateTimestampsInSameBatch()
+    {
+        var repository = new SqliteGlucoseReadingRepository(CreateTempDatabasePath());
+        var recordedAt = new DateTime(2026, 1, 15, 8, 0, 0);
+        var readings = new[]
+        {
+            new GlucoseReading(100, recordedAt),
+            new GlucoseReading(105, recordedAt)
+        };
+
+        repository.SaveReadings(readings);
         var loadedReadings = repository.LoadReadings();
 
         Assert.Single(loadedReadings);
-        Assert.Equal(replacementReadings[0].ValueMgPerDl, loadedReadings[0].ValueMgPerDl);
-        Assert.Equal(replacementReadings[0].RecordedAt, loadedReadings[0].RecordedAt);
+        Assert.Equal(105, loadedReadings[0].ValueMgPerDl);
+        Assert.Equal(recordedAt, loadedReadings[0].RecordedAt);
     }
 
     private static string CreateTempDatabasePath()
