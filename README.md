@@ -14,7 +14,7 @@ For now this is still early setup work. The app loads sample readings, saves the
 - Sample CSV readings load into the app
 - Readings are saved locally with SQLite
 - Basic summaries, GMI estimate, recent history, trend, and alerts are printed
-- No Dexcom connection yet
+- First Dexcom Web API reading source is wired behind the reading-source interface when `DEXCOM_ACCESS_TOKEN` is set
 - No desktop UI yet
 
 ## Project Structure
@@ -25,6 +25,14 @@ For now this is still early setup work. The app loads sample readings, saves the
 - `MySugarBuddy.Desktop` is the entry point for now. It may become an Avalonia desktop app later.
 
 The main rule I want to follow is that the UI should not call Dexcom or database code directly. Also, glucose analysis should use normal app/domain models instead of depending on Dexcom-specific response objects.
+
+## Dexcom Sync
+
+By default the desktop app still loads `samples/glucose-readings.csv`.
+
+To try the first Dexcom-backed source, set `DEXCOM_ACCESS_TOKEN` before running the app. The adapter calls the Dexcom EGV endpoint for the last three hours and converts the response into normal `GlucoseReading` objects before the application service saves them locally.
+
+`DEXCOM_API_BASE_URL` can point the adapter at another Dexcom-compatible base URL for sandbox testing. If it is not set, the app uses `https://api.dexcom.com`.
 
 ## Safety Note
 

@@ -5,7 +5,21 @@ using MySugarBuddy.Infrastructure;
 Console.WriteLine("My Sugar Buddy");
 Console.WriteLine();
 
-var readingSource = new FileGlucoseReadingSource(Path.Combine("samples", "glucose-readings.csv"));
+var readingSourceName = "samples/glucose-readings.csv";
+IGlucoseReadingSource readingSource = new FileGlucoseReadingSource(Path.Combine("samples", "glucose-readings.csv"));
+var dexcomAccessToken = Environment.GetEnvironmentVariable("DEXCOM_ACCESS_TOKEN");
+if (!string.IsNullOrWhiteSpace(dexcomAccessToken))
+{
+    readingSourceName = "Dexcom Web API";
+    readingSource = new DexcomGlucoseReadingSource(
+        new HttpClient(),
+        new DexcomGlucoseReadingSourceOptions
+        {
+            AccessToken = dexcomAccessToken,
+            BaseUri = GetDexcomBaseUri()
+        });
+}
+
 var readingRepository = new SqliteGlucoseReadingRepository(Path.Combine("data", "glucose-readings.db"));
 var alertService = new GlucoseAlertService();
 var notificationPort = new WindowsNotificationPort(new ConsoleNotificationPort());
@@ -26,7 +40,7 @@ if (current is not null)
 }
 
 Console.WriteLine();
-Console.WriteLine("Loaded sample readings from samples/glucose-readings.csv");
+Console.WriteLine($"Loaded readings from {readingSourceName}");
 Console.WriteLine("Saved readings to data/glucose-readings.db");
 Console.WriteLine($"Readings loaded: {snapshot.Summary.ReadingCount}");
 Console.WriteLine($"Average glucose: {snapshot.Summary.AverageValueMgPerDl:F1} mg/dL");
@@ -61,4 +75,16 @@ else
 }
 
 Console.WriteLine();
-Console.WriteLine("Dexcom sync is not implemented yet. Notifications use Windows when available, with console fallback.");
+Console.WriteLine("Set DEXCOM_ACCESS_TOKEN to sync from Dexcom. Notifications use Windows when available, with console fallback.");
+
+static Uri GetDexcomBaseUri()
+{
+    var configuredBaseUri = Environment.GetEnvironmentVariable("DEXCOM_API_BASE_URL");
+
+    if (string.IsNullOrWhiteSpace(configuredBaseUri))
+    {
+        return new Uri("https://api.dexcom.com");
+    }
+
+    return new Uri(configuredBaseUri);
+}
